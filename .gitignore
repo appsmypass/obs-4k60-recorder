@@ -1,0 +1,13 @@
+# Recordings and media
+recordings/
+*.mp4
+*.mkv
+*.flv
+
+# OBS logs / local config artifacts
+*.log
+logs/
+
+# Windows cruft
+Thumbs.db
+desktop.ini
