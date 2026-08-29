@@ -121,13 +121,57 @@ function Ensure-DisplayCapture {
 }
 
 function Ensure-GameCapture {
-    param($Ws, [string]$Scene = 'Game', [string]$Name = 'Game Capture')
+    param($Ws, [string]$Scene = 'Game', [string]$Name = 'Game Capture', [bool]$Enabled = $false)
     if (-not (Test-OBSInput $Ws $Name)) {
         Invoke-OBSRequest $Ws 'CreateInput' @{
             sceneName = $Scene; inputName = $Name; inputKind = 'game_capture'
             inputSettings = @{ capture_mode = 'any_fullscreen'; capture_cursor = $true; anti_cheat_hook = $true }
-            sceneItemEnabled = $true
+            sceneItemEnabled = $Enabled
         } | Out-Null
+    }
+}
+
+function Get-OBSSceneItemId {
+    param($Ws, [string]$Scene = 'Game', [string]$Source)
+    try { return (Invoke-OBSRequest $Ws 'GetSceneItemId' @{ sceneName = $Scene; sourceName = $Source }).responseData.sceneItemId }
+    catch { return $null }
+}
+
+function Set-OBSSceneItemEnabled {
+    param($Ws, [string]$Scene = 'Game', [string]$Source, [bool]$Enabled)
+    $id = Get-OBSSceneItemId $Ws -Scene $Scene -Source $Source
+    if ($null -eq $id) { return $false }
+    try {
+        Invoke-OBSRequest $Ws 'SetSceneItemEnabled' @{ sceneName = $Scene; sceneItemId = $id; sceneItemEnabled = $Enabled } | Out-Null
+        return $true
+    } catch { return $false }
+}
+
+function Set-OBSCaptureMode {
+    <#
+        Keeps exactly one capture source live. Running Display Capture and Game
+        Capture together makes OBS capture and composite the screen twice every
+        frame, which is a large GPU cost during gameplay for no extra footage.
+        A hidden source goes inactive, so OBS stops capturing it entirely.
+    #>
+    param($Ws, [ValidateSet('display', 'game', 'both')][string]$Mode = 'display', [string]$Scene = 'Game')
+    switch ($Mode) {
+        'display' {
+            Ensure-DisplayCapture $Ws -Scene $Scene | Out-Null
+            Set-OBSSceneItemEnabled $Ws -Scene $Scene -Source 'Display Capture' -Enabled $true  | Out-Null
+            Set-OBSSceneItemEnabled $Ws -Scene $Scene -Source 'Game Capture'    -Enabled $false | Out-Null
+        }
+        'game' {
+            Ensure-GameCapture $Ws -Scene $Scene -Enabled $true
+            Set-OBSSceneItemEnabled $Ws -Scene $Scene -Source 'Game Capture'    -Enabled $true  | Out-Null
+            Set-OBSSceneItemEnabled $Ws -Scene $Scene -Source 'Display Capture' -Enabled $false | Out-Null
+        }
+        'both' {
+            Ensure-DisplayCapture $Ws -Scene $Scene | Out-Null
+            Ensure-GameCapture $Ws -Scene $Scene -Enabled $true
+            Set-OBSSceneItemEnabled $Ws -Scene $Scene -Source 'Display Capture' -Enabled $true | Out-Null
+            Set-OBSSceneItemEnabled $Ws -Scene $Scene -Source 'Game Capture'    -Enabled $true | Out-Null
+        }
     }
 }
 
@@ -153,11 +197,17 @@ function Ensure-AudioInputs {
 
 function Set-OBSRecordConfig {
     param($Ws, [string]$Directory, [string]$FilenameFormat = '%CCYY-%MM-%DD %hh-%mm-%ss')
+    # OBS rejects these while a recording is running; they are also only a
+    # convenience (the profile already points at the same folder), so a failure
+    # here must never stop the caller from starting or stopping a recording.
+    if (Get-OBSRecordActive $Ws) { return }
     if ($Directory) {
         if (-not (Test-Path $Directory)) { New-Item -ItemType Directory -Force -Path $Directory | Out-Null }
-        Invoke-OBSRequest $Ws 'SetRecordDirectory' @{ recordDirectory = $Directory } | Out-Null
+        try { Invoke-OBSRequest $Ws 'SetRecordDirectory' @{ recordDirectory = $Directory } | Out-Null }
+        catch { Write-Warning "Could not set record directory: $($_.Exception.Message)" }
     }
-    Invoke-OBSRequest $Ws 'SetProfileParameter' @{ parameterCategory = 'Output'; parameterName = 'FilenameFormatting'; parameterValue = $FilenameFormat } | Out-Null
+    try { Invoke-OBSRequest $Ws 'SetProfileParameter' @{ parameterCategory = 'Output'; parameterName = 'FilenameFormatting'; parameterValue = $FilenameFormat } | Out-Null }
+    catch { Write-Warning "Could not set filename format: $($_.Exception.Message)" }
 }
 
 function Get-OBSRecordActive { param($Ws) [bool](Invoke-OBSRequest $Ws 'GetRecordStatus').responseData.outputActive }
@@ -172,6 +222,44 @@ function Stop-OBSRecord {
     param($Ws)
     if (Get-OBSRecordActive $Ws) { return (Invoke-OBSRequest $Ws 'StopRecord').responseData.outputPath }
     return $null
+}
+
+function Wait-OBSRecordStopped {
+    # The MP4 is still being finalized for a moment after StopRecord returns.
+    param($Ws, [int]$TimeoutSec = 30)
+    $deadline = (Get-Date).AddSeconds($TimeoutSec)
+    while ((Get-Date) -lt $deadline) {
+        try { if (-not (Get-OBSRecordActive $Ws)) { return $true } } catch { return $true }
+        Start-Sleep -Milliseconds 250
+    }
+    return $false
+}
+
+function Stop-OBSStudio {
+    <#
+        Closes OBS so it stops rendering the scene while you play. OBS keeps
+        capturing and compositing the canvas the whole time it is open, even when
+        idle and minimized, so leaving it running costs GPU during gameplay.
+        Only call this once recording has fully stopped.
+    #>
+    param([int]$TimeoutSec = 20)
+    $procs = @(Get-Process obs64 -ErrorAction SilentlyContinue)
+    if ($procs.Count -eq 0) { return $false }
+
+    foreach ($p in $procs) {
+        try { if ($p.MainWindowHandle -ne 0) { $p.CloseMainWindow() | Out-Null } } catch {}
+    }
+    $deadline = (Get-Date).AddSeconds($TimeoutSec)
+    while ((Get-Date) -lt $deadline) {
+        if (-not (Get-Process obs64 -ErrorAction SilentlyContinue)) { return $true }
+        Start-Sleep -Milliseconds 300
+    }
+    # Minimized to tray there is no window to close, so ask the process to exit.
+    foreach ($p in @(Get-Process obs64 -ErrorAction SilentlyContinue)) {
+        try { Stop-Process -Id $p.Id -ErrorAction SilentlyContinue } catch {}
+    }
+    Start-Sleep -Milliseconds 500
+    return (-not (Get-Process obs64 -ErrorAction SilentlyContinue))
 }
 
 function Get-OBSStudioPath {
