@@ -102,6 +102,20 @@ exist and to start/stop recording.
 - **Wrong monitor** — Display Capture picks the Primary monitor; set your game's
   screen as primary in Windows Display settings.
 
+## See also
+
+Recording at 4K60 is only half the job — the other half is having the headroom to
+actually play well while it happens.
+
+- **[gamemode](https://github.com/appsmypass/gamemode)** — one command to close
+  background bloat, pause Windows Update/Search indexing and switch power plans
+  before you record, and one command to put it all back afterwards. It knows not
+  to touch a running OBS or ffmpeg process.
+- **[vidkit](https://github.com/appsmypass/vidkit)** — trim, compress and convert
+  the recordings afterwards without memorising ffmpeg filtergraphs.
+- **[diskscout](https://github.com/appsmypass/diskscout)** — 4K60 footage fills a
+  drive fast; find what's eating it.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
