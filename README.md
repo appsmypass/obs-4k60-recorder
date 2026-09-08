@@ -1,22 +1,22 @@
-# OBS 4K/60 Game Recorder
+﻿# OBS 4K/60 Game Recorder
 
 One-click **4K / 60fps game recorder for Windows** with **game audio + mic**.
 
 It drives a genuine [OBS Studio](https://obsproject.com) install in the background
 over its WebSocket API, using your **GPU hardware encoder** (NVIDIA NVENC by
 default), and saves a single `.mp4` per session. You never have to touch the OBS
-window — the scripts start it minimized to the tray and control it for you.
+window â€” the scripts start it minimized to the tray and control it for you.
 
-Built because Windows' `gdigrab`/GDI screen capture tops out around ~13fps at 4K —
+Built because Windows' `gdigrab`/GDI screen capture tops out around ~13fps at 4K â€”
 real OBS + NVENC is what actually delivers smooth 4K60.
 
 You **start and stop it yourself** (before/after a game). No automatic
-game-detection by design — you're in control.
+game-detection by design â€” you're in control.
 
 ## Requirements
 
 - **Windows** with Windows PowerShell 5.1 (built in).
-- **[OBS Studio](https://obsproject.com)** 28+ — either the normal installer or
+- **[OBS Studio](https://obsproject.com)** 28+ â€” either the normal installer or
   `scoop install obs-studio`. (obs-websocket is bundled with OBS.)
 - A supported hardware encoder: **NVIDIA (NVENC)**, **Intel (QuickSync)**, or
   **AMD (AMF)**. Software `x264` also works on any GPU.
@@ -74,8 +74,8 @@ H.264 (hardware-encoded) video + 48 kHz AAC stereo audio.
 ## How it works
 
 ```
-GameRec.ps1  ──WebSocket──►  OBS Studio (tray)  ──NVENC──►  .mp4
-     ▲                            ▲
+GameRec.ps1  â”€â”€WebSocketâ”€â”€â–º  OBS Studio (tray)  â”€â”€NVENCâ”€â”€â–º  .mp4
+     â–²                            â–²
  launcher\*.cmd            profile "GameRec" (Setup-OBS.ps1)
 ```
 
@@ -94,28 +94,33 @@ exist and to start/stop recording.
 
 ## Troubleshooting
 
-- **"OBS Studio not found"** — install it, then re-run `Setup-OBS.ps1`.
-- **"websocket port never came up"** — in OBS: *Tools → WebSocket Server Settings
-  → Enable*, port `4455`, no password (or re-run `Setup-OBS.ps1` with OBS closed).
-- **No audio** — make sure a playback + mic device are set as *Default* in Windows
+- **"OBS Studio not found"** â€” install it, then re-run `Setup-OBS.ps1`.
+- **"websocket port never came up"** â€” in OBS: *Tools â†’ WebSocket Server Settings
+  â†’ Enable*, port `4455`, no password (or re-run `Setup-OBS.ps1` with OBS closed).
+- **No audio** â€” make sure a playback + mic device are set as *Default* in Windows
   Sound settings; the recorder uses the default devices.
-- **Wrong monitor** — Display Capture picks the Primary monitor; set your game's
+- **Wrong monitor** â€” Display Capture picks the Primary monitor; set your game's
   screen as primary in Windows Display settings.
 
 ## See also
 
-Recording at 4K60 is only half the job — the other half is having the headroom to
+Recording at 4K60 is only half the job â€” the other half is having the headroom to
 actually play well while it happens.
 
-- **[gamemode](https://github.com/appsmypass/gamemode)** — one command to close
+- **[gamemode](https://github.com/appsmypass/gamemode)** â€” one command to close
   background bloat, pause Windows Update/Search indexing and switch power plans
   before you record, and one command to put it all back afterwards. It knows not
   to touch a running OBS or ffmpeg process.
-- **[vidkit](https://github.com/appsmypass/vidkit)** — trim, compress and convert
+- **[clipsort](https://github.com/appsmypass/clipsort)** — after a month of
+  recording you will have hundreds of files called `2026-09-08 14-22-11.mkv`.
+  This sorts them into `Game\YYYY-MM\` folders, and knows to leave a clip alone
+  while OBS is still writing to it.
+- **[vidkit](https://github.com/appsmypass/vidkit)** â€” trim, compress and convert
   the recordings afterwards without memorising ffmpeg filtergraphs.
-- **[diskscout](https://github.com/appsmypass/diskscout)** — 4K60 footage fills a
+- **[diskscout](https://github.com/appsmypass/diskscout)** â€” 4K60 footage fills a
   drive fast; find what's eating it.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT â€” see [LICENSE](LICENSE).
+
