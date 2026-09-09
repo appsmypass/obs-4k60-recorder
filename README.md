@@ -115,6 +115,10 @@ actually play well while it happens.
   recording you will have hundreds of files called `2026-09-08 14-22-11.mkv`.
   This sorts them into `Game\YYYY-MM\` folders, and knows to leave a clip alone
   while OBS is still writing to it.
+- **[framecheck](https://github.com/appsmypass/framecheck)** — before you
+  spend an evening editing, check the recording actually came out right. Finds
+  variable framerate, duplicate frames, bitrate starvation and audio drift, and
+  names the OBS setting behind each one. Read-only.
 - **[clipmine](https://github.com/appsmypass/clipmine)** — a three hour
   session usually has four things worth keeping. Scans the audio for the moments
   you got loud and cuts each one out as its own clip. Never touches the original.
