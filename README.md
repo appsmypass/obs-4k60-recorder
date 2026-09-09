@@ -135,6 +135,10 @@ actually play well while it happens.
   recognized" even though you installed it, or the wrong Python keeps running.
   Audits your PATH for broken folders and duplicates, and names which copy of a
   command actually wins. Dry run by default, with a journaled undo.
+- **[bootlag](https://github.com/appsmypass/bootlag)** — your PC takes 50
+  seconds to boot and Task Manager only says “High”. This reads Windows' own
+  boot telemetry and gives you the millisecond cost of every startup app,
+  service and boot phase, so you know what is actually worth disabling.
 - **[diskscout](https://github.com/appsmypass/diskscout)** — 4K60 footage fills a
   drive fast; find what's eating it.
 
