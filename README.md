@@ -127,6 +127,10 @@ actually play well while it happens.
 - **[dupefind](https://github.com/appsmypass/dupefind)** — three copies of the
   same clip across three drives is normal after a year. Finds byte-identical
   duplicates and sends the extras to the Recycle Bin, never a hard delete.
+- **[pathfix](https://github.com/appsmypass/pathfix)** — "ffmpeg is not
+  recognized" even though you installed it, or the wrong Python keeps running.
+  Audits your PATH for broken folders and duplicates, and names which copy of a
+  command actually wins. Dry run by default, with a journaled undo.
 - **[diskscout](https://github.com/appsmypass/diskscout)** — 4K60 footage fills a
   drive fast; find what's eating it.
 
