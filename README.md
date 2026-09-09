@@ -117,6 +117,9 @@ actually play well while it happens.
   while OBS is still writing to it.
 - **[vidkit](https://github.com/appsmypass/vidkit)** — trim, compress and convert
   the recordings afterwards without memorising ffmpeg filtergraphs.
+- **[dupefind](https://github.com/appsmypass/dupefind)** — three copies of the
+  same clip across three drives is normal after a year. Finds byte-identical
+  duplicates and sends the extras to the Recycle Bin, never a hard delete.
 - **[diskscout](https://github.com/appsmypass/diskscout)** — 4K60 footage fills a
   drive fast; find what's eating it.
 
