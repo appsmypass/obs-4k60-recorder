@@ -123,6 +123,10 @@ actually play well while it happens.
   spend an evening editing, check the recording actually came out right. Finds
   variable framerate, duplicate frames, bitrate starvation and audio drift, and
   names the OBS setting behind each one. Read-only.
+- **[diskrate](https://github.com/appsmypass/diskrate)** — framecheck tells
+  you frames were dropped; this tells you whether the drive was why. Measures
+  the worst single second of sustained write speed, not the peak, and defeats
+  the Windows write cache — a naive benchmark overstated a real NVMe by 3.5x.
 - **[clipmine](https://github.com/appsmypass/clipmine)** — a three hour
   session usually has four things worth keeping. Scans the audio for the moments
   you got loud and cuts each one out as its own clip. Never touches the original.
