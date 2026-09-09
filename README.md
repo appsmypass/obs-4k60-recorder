@@ -127,6 +127,11 @@ actually play well while it happens.
   you frames were dropped; this tells you whether the drive was why. Measures
   the worst single second of sustained write speed, not the peak, and defeats
   the Windows write cache — a naive benchmark overstated a real NVMe by 3.5x.
+- **[gpucheck](https://github.com/appsmypass/gpucheck)** — on a laptop Windows
+  silently decides which GPU each app gets, and sometimes gives one app both.
+  Shows which adapter your game, OBS and browser are actually running on, and
+  flags the process whose frames are being copied across the bus every frame.
+  Read-only.
 - **[clipmine](https://github.com/appsmypass/clipmine)** — a three hour
   session usually has four things worth keeping. Scans the audio for the moments
   you got loud and cuts each one out as its own clip. Never touches the original.
