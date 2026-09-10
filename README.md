@@ -141,6 +141,11 @@ actually play well while it happens.
   actually cause stutter, how much of that 62% is reclaimable cache, and your
   commit charge against the real limit — the number that decides whether the
   next alt-tab stalls. Read-only.
+- **[netdrop](https://github.com/appsmypass/netdrop)** — OBS says
+  "dropped frames (network)" and Task Manager's graph looks fine. Windows already
+  measures the number that explains it — the TCP retransmission rate — and shows it
+  in no UI at all. Also catches the stale Wi-Fi link speed: the status dialog said
+  721 Mbps while the live counter said 400. Read-only.
 - **[clipmine](https://github.com/appsmypass/clipmine)** — a three hour
   session usually has four things worth keeping. Scans the audio for the moments
   you got loud and cuts each one out as its own clip. Never touches the original.
