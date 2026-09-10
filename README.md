@@ -136,6 +136,11 @@ actually play well while it happens.
   own `CurrentClockSpeed` as unreliable, and it is: this laptop reports a 1498 MHz
   maximum while actually delivering 3493 MHz. Shows the real clock per core, and
   whether a cap is your power plan or the hardware. Read-only.
+- **[ramcheck](https://github.com/appsmypass/ramcheck)** — Task Manager's
+  `Memory 62%` tells you almost nothing. This shows the hard page faults that
+  actually cause stutter, how much of that 62% is reclaimable cache, and your
+  commit charge against the real limit — the number that decides whether the
+  next alt-tab stalls. Read-only.
 - **[clipmine](https://github.com/appsmypass/clipmine)** — a three hour
   session usually has four things worth keeping. Scans the audio for the moments
   you got loud and cuts each one out as its own clip. Never touches the original.
