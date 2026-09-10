@@ -132,6 +132,10 @@ actually play well while it happens.
   Shows which adapter your game, OBS and browser are actually running on, and
   flags the process whose frames are being copied across the bus every frame.
   Read-only.
+- **[cpuclock](https://github.com/appsmypass/cpuclock)** — Windows documents its
+  own `CurrentClockSpeed` as unreliable, and it is: this laptop reports a 1498 MHz
+  maximum while actually delivering 3493 MHz. Shows the real clock per core, and
+  whether a cap is your power plan or the hardware. Read-only.
 - **[clipmine](https://github.com/appsmypass/clipmine)** — a three hour
   session usually has four things worth keeping. Scans the audio for the moments
   you got loud and cuts each one out as its own clip. Never touches the original.
