@@ -164,6 +164,9 @@ actually play well while it happens.
   service and boot phase, so you know what is actually worth disabling.
 - **[diskscout](https://github.com/appsmypass/diskscout)** — 4K60 footage fills a
   drive fast; find what's eating it.
+- **[truehz](https://github.com/appsmypass/truehz)** — your panel is not 60.000 Hz.
+  It prints the exact refresh rational Windows rounds away, and tells you which
+  capture fps actually matches it — often 30, not 60.
 
 ## License
 
