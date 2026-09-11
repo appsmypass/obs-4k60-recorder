@@ -167,6 +167,9 @@ actually play well while it happens.
 - **[truehz](https://github.com/appsmypass/truehz)** — your panel is not 60.000 Hz.
   It prints the exact refresh rational Windows rounds away, and tells you which
   capture fps actually matches it — often 30, not 60.
+- **[audiodrift](https://github.com/appsmypass/audiodrift)** — truehz for sound.
+  Measures the real sample rate of every audio endpoint from its own hardware
+  clock, so you know which ones will drift apart over a long recording.
 
 ## License
 
