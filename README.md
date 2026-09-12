@@ -170,6 +170,10 @@ actually play well while it happens.
 - **[audiodrift](https://github.com/appsmypass/audiodrift)** — truehz for sound.
   Measures the real sample rate of every audio endpoint from its own hardware
   clock, so you know which ones will drift apart over a long recording.
+- **[timerlag](https://github.com/appsmypass/timerlag)** — your game asked
+  Windows to wait 1 ms and got 15.6. Windows 11 silently ignores
+  `timeBeginPeriod` for throttled processes and returns success anyway, so it
+  measures the timer resolution your process actually receives.
 
 ## License
 
