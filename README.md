@@ -183,6 +183,11 @@ actually play well while it happens.
   pins at 100% whether the drive is doing 500 IOPS or 500,000. This shows the
   number Windows hides — `% Disk Time` unclamped, which hit 730% here while
   each I/O still finished in 0.27 ms. Read-only.
+- **[dpiscale](https://github.com/appsmypass/dpiscale)** — Settings
+  says `Scale: 200%` and stops there. Windows quietly hands different
+  resolutions to different apps depending on the DPI awareness each one
+  declares, which is why display capture comes out the wrong size. Found this
+  laptop driving a 3240x2160 panel at 1920x1080. Read-only.
 
 ## License
 
