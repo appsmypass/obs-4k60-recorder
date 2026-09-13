@@ -174,6 +174,10 @@ actually play well while it happens.
   Windows to wait 1 ms and got 15.6. Windows 11 silently ignores
   `timeBeginPeriod` for throttled processes and returns success anyway, so it
   measures the timer resolution your process actually receives.
+- **[usbspeed](https://github.com/appsmypass/usbspeed)** — your capture card
+  or external SSD is plugged into a 10 Gbps port and Windows still reports 480
+  Mbps. Every Windows UI reads a field that stops at USB 3.0; this reads the one
+  that does not, and was off by 20.8x on this laptop. Read-only.
 
 ## License
 
