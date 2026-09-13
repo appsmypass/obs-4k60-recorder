@@ -178,6 +178,11 @@ actually play well while it happens.
   or external SSD is plugged into a 10 Gbps port and Windows still reports 480
   Mbps. Every Windows UI reads a field that stops at USB 3.0; this reads the one
   that does not, and was off by 20.8x on this laptop. Read-only.
+- **[diskbusy](https://github.com/appsmypass/diskbusy)** — Task Manager
+  says `Disk 100%` and it means almost nothing: that bar is a duty cycle, so it
+  pins at 100% whether the drive is doing 500 IOPS or 500,000. This shows the
+  number Windows hides — `% Disk Time` unclamped, which hit 730% here while
+  each I/O still finished in 0.27 ms. Read-only.
 
 ## License
 
