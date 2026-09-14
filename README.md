@@ -188,6 +188,11 @@ actually play well while it happens.
   resolutions to different apps depending on the DPI awareness each one
   declares, which is why display capture comes out the wrong size. Found this
   laptop driving a 3240x2160 panel at 1920x1080. Read-only.
+- **[filelock](https://github.com/appsmypass/filelock)** — `The action
+  can't be completed because the file is open in another program.` Windows
+  knows exactly which program and refuses to say. This asks the Restart
+  Manager — the API Windows Setup uses — and names the process, the PID and
+  what to do about it. Never reports a locked file as free. Read-only.
 
 ## License
 
