@@ -193,6 +193,12 @@ actually play well while it happens.
   knows exactly which program and refuses to say. This asks the Restart
   Manager — the API Windows Setup uses — and names the process, the PID and
   what to do about it. Never reports a locked file as free. Read-only.
+- **[fragmap](https://github.com/appsmypass/fragmap)** — a recording that
+  stutters on playback may simply be in thousands of pieces. `defrag /A`
+  counts fragmented files across the whole drive but never names one, and
+  Explorer shows only a size. This reads the NTFS extent map for a single
+  file, counts the real physical fragments, and tells compression and sparse
+  holes apart from genuine fragmentation. No elevation, read-only.
 
 ## License
 
