@@ -199,6 +199,13 @@ actually play well while it happens.
   Explorer shows only a size. This reads the NTFS extent map for a single
   file, counts the real physical fragments, and tells compression and sparse
   holes apart from genuine fragmentation. No elevation, read-only.
+- **[codecmap](https://github.com/appsmypass/codecmap)** — OBS offers NVENC
+  on one machine and only x264 on another, and nothing on screen explains
+  why. This asks Media Foundation which codecs your GPUs can actually
+  hardware-encode, asks Direct3D which ones they can hardware-decode, and
+  shows both answers per GPU. Encoding and decoding are separate silicon,
+  and this is where that difference becomes visible. No elevation,
+  read-only.
 
 ## License
 
