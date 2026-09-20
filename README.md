@@ -206,6 +206,12 @@ actually play well while it happens.
   shows both answers per GPU. Encoding and decoding are separate silicon,
   and this is where that difference becomes visible. No elevation,
   read-only.
+- **[truefps](https://github.com/appsmypass/truefps)** — framecheck tells you
+  a clip is variable frame rate; this tells you exactly how. It reads the
+  MP4/MOV sample tables directly, rebuilds the true duration of every single
+  frame, and reports real average fps, the longest stall in milliseconds,
+  keyframe spacing and the audio/video duration drift that makes clips slide
+  out of sync in an editor. Zero dependencies, read-only.
 
 ## License
 
