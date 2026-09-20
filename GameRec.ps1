@@ -1,15 +1,20 @@
 <#
-    GameRec.ps1  -  Manual 4K/60 game recorder (drives genuine OBS via websocket)
+    GameRec.ps1  -  Manual game recorder (drives genuine OBS via websocket)
 
     USAGE:
         GameRec.ps1 start     # ensure OBS is running, then START recording
-        GameRec.ps1 stop      # STOP recording and save the MP4
+        GameRec.ps1 stop      # STOP recording, save the MP4, close OBS
         GameRec.ps1 toggle    # start if stopped, stop if recording
         GameRec.ps1 status    # show whether OBS is recording + record folder
+        GameRec.ps1 quit      # close OBS so it stops using the GPU
 
-    Records your primary display at its native resolution and 60fps using your
+    Captures your primary display at its native resolution and 60fps using your
     GPU hardware encoder (NVIDIA NVENC by default), with game sound + mic, to:
         %USERPROFILE%\Downloads\recordings\<date time>.mp4
+
+    OBS is closed again after you stop, because it keeps capturing and rendering
+    the canvas the whole time it is open - which costs GPU while you play. Pass
+    -KeepOpen if you would rather leave it running between recordings.
 
     You start/stop it yourself (e.g. before/after a game). No auto game-detection.
 
@@ -19,8 +24,13 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('start', 'stop', 'toggle', 'status')]
+    [ValidateSet('start', 'stop', 'toggle', 'status', 'quit')]
     [string]$Action = 'toggle',
+    # 'display' is cheapest. 'game' hooks fullscreen games only. 'both' costs the most.
+    [ValidateSet('display', 'game', 'both')]
+    [string]$Capture = 'display',
+    # Leave OBS running after stopping a recording.
+    [switch]$KeepOpen,
     [int]$Port = 4455
 )
 
@@ -33,30 +43,56 @@ function Write-Info($m) { Write-Host $m -ForegroundColor Cyan }
 function Write-Ok($m)   { Write-Host $m -ForegroundColor Green }
 function Write-Warn($m) { Write-Host $m -ForegroundColor Yellow }
 
+function Complete-Recording {
+    param($Ws, [string]$Prefix = 'Saved')
+    $out = Stop-OBSRecord $Ws
+    Wait-OBSRecordStopped $Ws | Out-Null
+    Start-Sleep -Milliseconds 800
+    if ($out -and (Test-Path $out)) {
+        Write-Ok ("{0}: {1}  ({2:N1} MB)" -f $Prefix, $out, ((Get-Item $out).Length / 1MB))
+    } else {
+        Write-Ok ("{0}: {1}" -f $Prefix, $out)
+    }
+}
+
 try {
-    # 'stop'/'status' don't launch OBS if it's not up; 'start'/'toggle' do.
+    # 'stop'/'status'/'quit' don't launch OBS if it's not up; 'start'/'toggle' do.
     if ($Action -in 'start', 'toggle') {
         $state = Start-OBSIfNeeded -Port $Port
         if ($state -eq 'started') { Write-Info 'Started OBS (minimized to tray)...' ; Start-Sleep -Seconds 2 }
     }
     else {
         if (-not (Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue)) {
+            if ($Action -eq 'quit' -and (Get-Process obs64 -ErrorAction SilentlyContinue)) {
+                if (Stop-OBSStudio) { Write-Ok 'Closed OBS.' } else { Write-Warn 'Could not close OBS.' }
+                return
+            }
             Write-Warn 'OBS is not running - nothing to do.'
             return
         }
     }
 
+    if ($Action -eq 'quit') {
+        $ws = Connect-OBS -Port $Port
+        if (Get-OBSRecordActive $ws) { Complete-Recording $ws -Prefix 'Stopped, saved' }
+        Disconnect-OBS $ws
+        if (Stop-OBSStudio) { Write-Ok 'Closed OBS.' } else { Write-Warn 'Could not close OBS.' }
+        return
+    }
+
     $ws = Connect-OBS -Port $Port
 
-    # Make sure capture sources + output settings exist (idempotent).
-    if ($Action -in 'start', 'toggle') {
-        Ensure-DisplayCapture $ws | Out-Null
-        Ensure-GameCapture   $ws
+    $active = Get-OBSRecordActive $ws
+    $willStart = -not $active -and $Action -in 'start', 'toggle'
+
+    # Only touch sources/output settings when a recording is about to begin. OBS
+    # rejects SetRecordDirectory while a recording is running, and reconfiguring
+    # capture sources mid-recording would show up in the footage.
+    if ($willStart) {
+        Set-OBSCaptureMode   $ws -Mode $Capture
         Ensure-AudioInputs   $ws
         Set-OBSRecordConfig  $ws -Directory $RecDir
     }
-
-    $active = Get-OBSRecordActive $ws
 
     switch ($Action) {
         'status' {
@@ -68,31 +104,24 @@ try {
         }
         'start' {
             if ($active) { Write-Warn 'Already recording.' }
-            else { Start-OBSRecord $ws | Out-Null; Write-Ok 'Recording STARTED (native resolution @ 60fps, hardware encoder).' }
+            else { Start-OBSRecord $ws | Out-Null; Write-Ok 'Recording STARTED (hardware encoder).' }
         }
         'stop' {
             if (-not $active) { Write-Warn 'Not currently recording.' }
-            else {
-                $out = Stop-OBSRecord $ws
-                Start-Sleep -Milliseconds 800
-                if ($out -and (Test-Path $out)) {
-                    Write-Ok ("Saved: {0}  ({1:N1} MB)" -f $out, ((Get-Item $out).Length / 1MB))
-                } else { Write-Ok ("Saved: {0}" -f $out) }
-            }
+            else { Complete-Recording $ws }
         }
         'toggle' {
-            if ($active) {
-                $out = Stop-OBSRecord $ws
-                Start-Sleep -Milliseconds 800
-                if ($out -and (Test-Path $out)) {
-                    Write-Ok ("Stopped. Saved: {0}  ({1:N1} MB)" -f $out, ((Get-Item $out).Length / 1MB))
-                } else { Write-Ok ("Stopped. Saved: {0}" -f $out) }
-            }
-            else { Start-OBSRecord $ws | Out-Null; Write-Ok 'Recording STARTED (native resolution @ 60fps, hardware encoder).' }
+            if ($active) { Complete-Recording $ws -Prefix 'Stopped. Saved' }
+            else { Start-OBSRecord $ws | Out-Null; Write-Ok 'Recording STARTED (hardware encoder).' }
         }
     }
 
+    $stoppedRecording = ($Action -eq 'stop' -and $active) -or ($Action -eq 'toggle' -and $active)
     Disconnect-OBS $ws
+
+    if ($stoppedRecording -and -not $KeepOpen) {
+        if (Stop-OBSStudio) { Write-Info 'Closed OBS (it no longer uses the GPU).' }
+    }
 }
 catch {
     Write-Host "ERROR: $($_.Exception.Message)" -ForegroundColor Red
