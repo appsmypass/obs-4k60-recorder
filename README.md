@@ -212,6 +212,13 @@ actually play well while it happens.
   frame, and reports real average fps, the longest stall in milliseconds,
   keyframe spacing and the audio/video duration drift that makes clips slide
   out of sync in an editor. Zero dependencies, read-only.
+- **[muxcheck](https://github.com/appsmypass/muxcheck)** — a clip that scrubs
+  badly, uploads slowly or refuses to play until it has fully downloaded is
+  almost always a container layout problem rather than an encoding one. This
+  reads the layout directly: whether the `moov` index sits before or after
+  the `mdat`, how well audio and video are interleaved, wasted `free`
+  padding, edit lists that shift the start, and recordings OBS never
+  finalised. Zero dependencies, read-only.
 
 ## License
 
