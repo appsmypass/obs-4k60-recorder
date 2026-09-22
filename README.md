@@ -219,6 +219,12 @@ actually play well while it happens.
   the `mdat`, how well audio and video are interleaved, wasted `free`
   padding, edit lists that shift the start, and recordings OBS never
   finalised. Zero dependencies, read-only.
+- **[colorcheck](https://github.com/appsmypass/colorcheck)** — your recording
+  looks washed out, crushed or oversaturated next to what you saw while you
+  were playing. This reads the colour tags the file actually carries, the
+  `colr` box and the H.264/H.265 SPS VUI, and reports colour range (full vs
+  limited), primaries, transfer and matrix, then names the mismatch and the
+  OBS setting behind it. Zero dependencies, read-only.
 
 ## License
 
